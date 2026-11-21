@@ -1,0 +1,66 @@
+name: build
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+
+env:
+  SINGBOX_VERSION: "1.14.4"
+
+jobs:
+  windows:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+      - name: Vet and test
+        run: |
+          go vet ./...
+          go test ./...
+          (cd installer && go test ./...)
+      - name: Build app and installer
+        env:
+          GOOS: windows
+          GOARCH: amd64
+          CGO_ENABLED: "0"
+        run: |
+          mkdir -p dist installer/payload
+          go build -trimpath -ldflags "-s -w -H windowsgui" -o dist/Sharkoxy.exe .
+          cp dist/Sharkoxy.exe installer/payload/Sharkoxy.exe
+          (cd installer && go build -trimpath -ldflags "-s -w -H windowsgui" -o ../dist/Sharkoxy-Setup.exe .)
+      - name: Full installer with sing-box bundled
+        run: |
+          curl -fsSL -o dist/singbox.zip "https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-windows-amd64.zip"
+          sha256sum dist/singbox.zip
+          cat dist/Sharkoxy-Setup.exe dist/singbox.zip > dist/Sharkoxy-Setup-Full.exe
+          rm dist/singbox.zip
+      - name: Sign the update manifest (what makes installed apps update themselves)
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: |
+          VER="${GITHUB_REF_NAME#v}"
+          go run ./tools/signrelease sign -exe dist/Sharkoxy.exe -version "$VER" \
+            -url "https://github.com/${GITHUB_REPOSITORY}/releases/download/${GITHUB_REF_NAME}/Sharkoxy.exe" \
+            -notes "Sharkoxy $VER" -out dist
+      # Code signing (removes the "Unknown publisher" warning): apply to SignPath Foundation (free for open source),
+      # then add their official GitHub action here to sign dist/*.exe BEFORE the manifest step above.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows
+          path: dist/*.exe
+      - name: Publish release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/Sharkoxy-Setup-Full.exe
+            dist/Sharkoxy-Setup.exe
+            dist/Sharkoxy.exe
+            dist/update.json
+            dist/update.json.sig

@@ -1,0 +1,13 @@
+Sharkoxy - Copyright (C) 2026 the Sharkoxy contributors. Licensed under the GNU GPL v3 (see LICENSE).
+
+Sharkoxy is a front end. The proxy engine is sing-box (https://github.com/SagerNet/sing-box), GPL-3.0 with additional
+terms, Copyright (C) SagerNet. Releases that bundle sing-box ship its unmodified binary; its source for the bundled
+version is at https://github.com/SagerNet/sing-box/tree/<version tag>. Sharkoxy is not affiliated with SagerNet.
+
+Third-party material included in this repository:
+- WebView2Loader.dll (assets/) - Microsoft Edge WebView2 SDK, (c) Microsoft Corporation, BSD-style license
+  (https://www.nuget.org/packages/Microsoft.Web.WebView2). Needs the WebView2 Runtime, preinstalled on current Windows 10/11.
+- Press Start 2P (c) The Press Start 2P Project Authors (CodeMan38), SIL Open Font License 1.1
+- VT323 (c) The VT323 Project Authors (Peter Hull), SIL Open Font License 1.1
+- World map shape: Natural Earth (public domain), via the world-atlas package, reduced to a 1.5 degree pixel mask.
+- Inspired by Karing (https://github.com/KaringX/karing); no Karing code is used.

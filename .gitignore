@@ -1,0 +1,7 @@
+*.exe
+!assets/*
+installer/payload/
+dist/
+sharkoxy
+sharkoxy-linux
+*.log
