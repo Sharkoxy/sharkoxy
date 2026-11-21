@@ -30,6 +30,8 @@ Sharkoxy has no accounts, ads or analytics, and sends nothing about you to the p
 
 ## Code signing policy
 
+Free code signing provided by SignPath.io, certificate by SignPath Foundation.
+
 Release builds are made automatically from this repository by GitHub Actions. Only the project owner, Shahriar Rahman, may approve a release for signing, and he is the sole committer, reviewer and approver. Signed files are the installers and `Sharkoxy.exe` published on the Releases page. Never download Sharkoxy from anywhere else.
 
 ## License
