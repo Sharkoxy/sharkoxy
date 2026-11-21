@@ -24,6 +24,14 @@ More about the project and its author: see **About Sharkoxy.docx**.
 
 Needs Go 1.24. The release workflow in `.github/workflows` shows the exact steps.
 
+## Privacy
+
+Sharkoxy has no accounts, ads or analytics, and sends nothing about you to the project. Your subscription links and settings stay on your computer. The app only contacts: your own subscription provider (to refresh servers), GitHub (to check for signed updates, through your proxy when connected), and the sites you test in the Connectivity box.
+
+## Code signing policy
+
+Release builds are made automatically from this repository by GitHub Actions. Only the project owner, Shahriar Rahman, may approve a release for signing, and he is the sole committer, reviewer and approver. Signed files are the installers and `Sharkoxy.exe` published on the Releases page. Never download Sharkoxy from anywhere else.
+
 ## License
 
 GPL-3.0. Sharkoxy uses [sing-box](https://github.com/SagerNet/sing-box), see `NOTICE`.
