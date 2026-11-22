@@ -447,6 +447,7 @@ func waitNet(max time.Duration) {
 func (a *App) fastestLoop() {
 	now := time.Now()
 	last, lastLight, lastFull, lastFresh, lastSys := now, now, now, now, now
+	var badSince, lastRestart time.Time // no server verified although the PC has internet
 	for range time.Tick(10 * time.Second) {
 		now := time.Now()
 		resumed := now.Sub(last) > 40*time.Second // the tick stalled: the PC was asleep
@@ -482,6 +483,10 @@ func (a *App) fastestLoop() {
 				a.closeConnections()
 				a.testAll(true)
 				lastLight, lastFull = time.Now(), time.Now()
+				if a.noneVerified() && time.Since(lastRestart) > time.Minute {
+					lastRestart = time.Now()
+					a.restartCore("network came back but no server answers")
+				}
 			} else if now.Sub(lastFresh) >= 30*time.Second {
 				// our own probes may be blocked while the servers still work: try the servers
 				lastFresh = now
@@ -492,6 +497,20 @@ func (a *App) fastestLoop() {
 		if pinnedDead {
 			log.Println("pinned server stopped answering, back to auto")
 			_ = a.selectNode("auto")
+		}
+		if untested && now.Sub(lastFresh) >= 15*time.Second {
+			// Everything failed while the PC itself is online: the core may be stuck on an old network
+			// (Wi-Fi change, VPN, adapter reset). After 90 s, start it fresh.
+			if badSince.IsZero() {
+				badSince = now
+			} else if now.Sub(badSince) > 90*time.Second && now.Sub(lastRestart) > 5*time.Minute && netUp() {
+				lastRestart, badSince = now, time.Time{}
+				a.restartCore("no server answered for 90 s while the internet is up")
+				lastLight, lastFull, lastFresh = time.Now(), time.Now(), time.Now()
+				continue
+			}
+		} else if !untested {
+			badSince = time.Time{}
 		}
 		if now.Sub(lastSys) >= 30*time.Second {
 			lastSys = now
@@ -515,6 +534,9 @@ func (a *App) fastestLoop() {
 // assertSysProxy puts the system proxy back if something else changed it (max 3 times per session).
 func (a *App) assertSysProxy() {
 	a.mu.Lock()
+	if time.Since(a.proxyFixAt) > 10*time.Minute {
+		a.proxyFixes = 0 // up to 3 repairs per 10 minutes, not 3 per session
+	}
 	want := a.set.SysProxy && a.running && a.proxyFixes < 3
 	addr := fmt.Sprintf("127.0.0.1:%d", a.mixed)
 	a.mu.Unlock()
@@ -524,18 +546,20 @@ func (a *App) assertSysProxy() {
 	log.Println("system proxy was changed by another program, restoring it")
 	a.mu.Lock()
 	a.proxyFixes++
+	a.proxyFixAt = time.Now()
 	a.mu.Unlock()
 	applySysProxy(true, addr)
 }
 
 // ---- core crash recovery ---------------------------------------------------------------
 
-// recoverCore restarts the core after an unexpected exit, with back-off (1.5 s ... 30 s), up to 8 tries.
+// recoverCore restarts the core after an unexpected exit, with back-off (1.5 s ... 60 s). It keeps trying until
+// the person disconnects or someone else has reconnected, because a long session should heal by itself.
 func (a *App) recoverCore() {
-	for attempt := 0; attempt < 8; attempt++ {
-		d := 1500 * time.Millisecond << uint(attempt)
-		if d > 30*time.Second {
-			d = 30 * time.Second
+	for attempt := 0; ; attempt++ {
+		d := 1500 * time.Millisecond << uint(min(attempt, 6))
+		if d > 60*time.Second {
+			d = 60 * time.Second
 		}
 		time.Sleep(d)
 		a.mu.Lock()
@@ -543,6 +567,9 @@ func (a *App) recoverCore() {
 		a.mu.Unlock()
 		if gone {
 			return
+		}
+		if attempt >= 3 {
+			waitNet(20 * time.Second)
 		}
 		if a.begin("reconnecting") != nil {
 			continue
@@ -557,8 +584,36 @@ func (a *App) recoverCore() {
 			return
 		}
 		log.Println("core restart failed:", err)
+		if attempt == 7 {
+			a.setErr(errors.New("The core keeps stopping, still trying: " + tailFile(coreLogPath(), 2)))
+		}
 	}
-	a.setErr(errors.New("The core keeps stopping: " + tailFile(coreLogPath(), 2)))
+}
+
+// noneVerified: no server currently has a good delay.
+func (a *App) noneVerified() bool {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	for _, d := range a.delays {
+		if d > 0 {
+			return false
+		}
+	}
+	return true
+}
+
+// restartCore starts the core again (keeps the system proxy and settings) to clear a stuck state.
+func (a *App) restartCore(why string) {
+	log.Println("restarting the core:", why)
+	if a.begin("reconnecting") != nil {
+		return
+	}
+	err := a.reconnect()
+	a.end()
+	if err != nil {
+		log.Println("restart failed:", err)
+		go a.recoverCore()
+	}
 }
 
 func coreLogPath() string { return dataDir + string(os.PathSeparator) + "core.log" }

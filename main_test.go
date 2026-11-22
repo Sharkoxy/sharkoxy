@@ -340,8 +340,8 @@ func TestClashBlockStyle(t *testing.T) {
 func TestParseDeepLink(t *testing.T) {
 	ok := map[string][2]string{
 		"sharkoxy://add?url=https%3A%2F%2Fa.example%2Fsub%3Ftoken%3D1&name=Work": {"https://a.example/sub?token=1", "Work"},
-		"clash://install-config?url=https%3A%2F%2Fa.example%2Fx":                  {"https://a.example/x", ""},
-		"sing-box://import-remote-profile?url=https%3A%2F%2Fa.example%2Fx#Home":   {"https://a.example/x", "Home"},
+		"clash://install-config?url=https%3A%2F%2Fa.example%2Fx":                 {"https://a.example/x", ""},
+		"sing-box://import-remote-profile?url=https%3A%2F%2Fa.example%2Fx#Home":  {"https://a.example/x", "Home"},
 	}
 	for in, want := range ok {
 		u, n, err := parseDeepLink(in)

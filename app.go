@@ -106,6 +106,7 @@ type App struct {
 	userPin        string // node the user picked by hand ("" = automatic)
 	liveMS         int    // last real request through the proxy
 	hist           []histPt
+	proxyFixAt     time.Time
 	importReq      *pendingImport
 	lastRefresh    time.Time
 	lastSwitch     time.Time
@@ -404,7 +405,15 @@ func (a *App) connect() error {
 	a.cancelTraffic = cancel
 	pin := a.userPin
 	a.mu.Unlock()
-	go a.streamTraffic(ctx, api, secret)
+	go func() { // the speed feed re-attaches by itself if it ever drops
+		for ctx.Err() == nil {
+			a.streamTraffic(ctx, api, secret)
+			select {
+			case <-ctx.Done():
+			case <-time.After(3 * time.Second):
+			}
+		}
+	}()
 	if pin != "" {
 		_ = a.apiCall("PUT", "/proxies/proxy", map[string]string{"name": pin}, 5*time.Second, nil)
 	}

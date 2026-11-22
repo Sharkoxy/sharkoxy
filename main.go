@@ -18,7 +18,7 @@ var indexHTML string
 
 const (
 	uiPort  = 17800
-	version = "1.7.0"
+	version = "1.7.1"
 )
 
 var dataDir string
