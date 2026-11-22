@@ -178,6 +178,13 @@ func uninstall() {
 	}
 	_ = hidden("reg", "delete", `HKCU\Software\Microsoft\Windows\CurrentVersion\Run`, "/v", appName, "/f").Run()
 	_ = hidden("reg", "delete", uninstKey, "/f").Run()
+	_ = hidden("reg", "delete", `HKCU\Software\Classes\sharkoxy`, "/f").Run()
+	for _, sc := range []string{"clash", "sing-box"} { // only if we were the one handling them
+		k := `HKCU\Software\Classes\` + sc
+		if out, err := hidden("reg", "query", k+`\shell\open\command`, "/ve").Output(); err == nil && strings.Contains(string(out), "Sharkoxy") {
+			_ = hidden("reg", "delete", k, "/f").Run()
+		}
+	}
 	_ = os.Remove(filepath.Join(startMenuDir(), appName+".lnk"))
 	_ = os.Remove(filepath.Join(desktopDir(), appName+".lnk"))
 	kept := true

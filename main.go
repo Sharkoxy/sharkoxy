@@ -18,7 +18,7 @@ var indexHTML string
 
 const (
 	uiPort  = 17800
-	version = "1.6.2"
+	version = "1.7.0"
 )
 
 var dataDir string
@@ -72,7 +72,10 @@ func main() {
 		ln, err = net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", uiPort))
 	}
 	if err != nil {
-		// already running: just bring up another window for it
+		// already running: hand over a clicked link, or just bring up another window for it
+		if l := firstDeepLink(flag.Args()); l != "" && postImport(l) {
+			return
+		}
 		if !*noBrowser && !*background && !pingShow() {
 			openWindow(uiURL, nil)
 		}
@@ -84,6 +87,10 @@ func main() {
 
 	cleanupStaleProxy()
 	app := newApp()
+	registerProtocols(app.set.LinkAll)
+	if l := firstDeepLink(flag.Args()); l != "" {
+		_ = app.queueImport(l)
+	}
 	srv := &http.Server{Handler: app.routes(), ReadHeaderTimeout: 10 * time.Second}
 	go func() { log.Println("server:", srv.Serve(ln)) }()
 

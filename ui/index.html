@@ -82,6 +82,15 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 @keyframes blink2{50%{opacity:.2}}
 .speed{display:flex;gap:20px;justify-content:center;margin-top:8px;font-size:22px;color:var(--text2);min-height:22px}
 .speed b{color:var(--white);font-weight:400}
+#isheet .row{display:flex;gap:10px;margin-top:6px}
+.spark{margin:10px auto 0;max-width:340px;height:44px}
+.spark svg{width:100%;height:44px;display:block}
+.spark .gd{fill:none;stroke:var(--green);stroke-width:2;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
+.spark .gu{fill:none;stroke:var(--blue);stroke-width:2;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
+.spark .gf{fill:var(--green);opacity:.15}
+.spark .gp{fill:none;stroke:var(--yellow);stroke-width:1.5;vector-effect:non-scaling-stroke;opacity:.8}
+.sparkl{display:flex;justify-content:space-between;font-size:15px;color:var(--text3);max-width:340px;margin:2px auto 0}
+html[data-theme="apple"] .spark .gd,html[data-theme="apple"] .spark .gu,html[data-theme="apple"] .spark .gp{shape-rendering:auto;stroke-linejoin:round;stroke-linecap:round}
 .live{font-size:19px;color:var(--text3);min-height:20px}
 
 /* controls */
@@ -283,6 +292,7 @@ html[data-theme="apple"] .power svg{width:48px;height:48px;shape-rendering:geome
 html[data-theme="apple"] .power:hover:not(:disabled){background:var(--lav);color:var(--text)}
 html[data-theme="apple"] .power:active:not(:disabled){transform:scale(.96);box-shadow:inset 0 0 0 1px var(--bd)}
 html[data-theme="apple"] .power.on{background:var(--green);color:#fff;box-shadow:0 8px 24px rgba(52,199,89,.35)}
+html[data-theme="apple"] .power.on:hover:not(:disabled){background:var(--green);color:#fff;filter:brightness(1.07)}
 html[data-theme="apple"] .power.busy{background:var(--orange);color:#fff;animation:blink .9s ease-in-out infinite}
 html[data-theme="apple"] .status{font:650 24px var(--px);letter-spacing:-.02em;text-shadow:none;margin-top:14px}
 html[data-theme="apple"] .status.on{color:var(--green)}
@@ -389,6 +399,7 @@ html[data-theme="apple"] .alogo svg{border-radius:22px}
         <div class="sub" id="substatus"></div>
         <div class="chips" id="chips"></div>
         <div class="speed num" id="speed"></div>
+        <div class="spark" id="spark"></div>
         <div class="live num" id="live"></div>
       </div>
       <div id="banner"></div>
@@ -423,6 +434,7 @@ html[data-theme="apple"] .alogo svg{border-radius:22px}
 <div class="modal hidden" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="modal hidden" id="amodal"><div class="sheet" id="asheet"></div></div>
 <div class="modal hidden" id="smodal"><div class="sheet sanim"><canvas id="stage" class="stage" aria-hidden="true"></canvas><div id="stext" class="stext"></div></div></div>
+<div class="modal hidden" id="imodal"><div class="sheet" id="isheet"></div></div>
 <div class="modal hidden" id="tmodal"><div class="sheet" id="tsheet"></div></div>
 
 <script>
@@ -810,6 +822,38 @@ document.addEventListener('click', e => {
   if(t.matches('[data-pick]')) pickTheme(t.dataset.pick);
   else { showTheme = false; renderTheme(); if(!S.settings.theme) pickTheme('pixel'); }
 });
+function sparkline(h){
+  if(h.length < 3) return '';
+  const W = 300, H = 40, n = h.length;
+  const mx = Math.max(1024, ...h.map(p => Math.max(p.d, p.u)));
+  const X = i => (i / Math.max(1, n - 1) * W).toFixed(1), Y = v => (H - 2 - (v / mx) * (H - 6)).toFixed(1);
+  const line = k => h.map((p, i) => (i ? 'L' : 'M') + X(i) + ' ' + Y(p[k])).join('');
+  const area = line('d') + `L${W} ${H}L0 ${H}Z`;
+  const ps = h.map(p => p.p).filter(v => v > 0);
+  const avg = ps.length ? Math.round(ps.reduce((a, b) => a + b, 0) / ps.length) : 0;
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path class="gf" d="${area}"/><path class="gd" d="${line('d')}"/><path class="gu" d="${line('u')}"/></svg>
+    <div class="sparkl num"><span>last ${n}s</span><span>${avg ? 'avg ping ' + avg + ' ms' : ''}</span><span>peak ${fmtSpeed(mx > 1024 ? mx : 0)}</span></div>`;
+}
+let importShown = '';
+function renderImport(){
+  const m = $('imodal'), p = S && S.import;
+  if(!p){ m.classList.add('hidden'); importShown = ''; return; }
+  if(importShown === p.url) return;
+  importShown = p.url;
+  let host = p.url; try{ host = new URL(p.url).host; }catch(e){}
+  const q = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('isheet').innerHTML = `<div class="sheet-h"><h2>ADD SUBSCRIPTION?</h2></div>
+    <p style="margin-bottom:10px">A link you opened wants to add this subscription to Sharkoxy:</p>
+    <div class="edit"><b>${q(p.name || 'New profile')}</b><p style="word-break:break-all;margin-top:6px">${q(host)}</p></div>
+    <p style="margin:10px 0">Only add it if you trust where it came from.</p>
+    <div class="row"><button class="btn" data-imp="0">No</button><button class="btn pri" data-imp="1">Add it</button></div>`;
+  m.classList.remove('hidden');
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-imp]'); if(!b) return;
+  $('imodal').classList.add('hidden');
+  act('/api/import', {accept: b.dataset.imp === '1'});
+});
 function maybeWelcome(){
   // one-time thank-you after the very first successful connection
   if(S && S.connected && !S.busy && !S.welcomed && !welcomeSent){
@@ -851,6 +895,8 @@ function render(){
   }
   setHTML($('chips'), chips);
   setHTML($('speed'), S.connected ? `<span>↓ <b>${fmtSpeed(S.down)}</b></span><span>↑ <b>${fmtSpeed(S.up)}</b></span>` : '');
+  setHTML($('spark'), S.connected ? sparkline(S.hist||[]) : '');
+  renderImport();
   setHTML($('live'), S.connected && S.live > 0 ? `last real request: ${S.live} ms` : '');
 
   // banner
@@ -916,7 +962,7 @@ function render(){
       <p>Paste a subscription link (v2ray or Clash), a Clash profile, or share links.${P.length ? ' Your servers from all profiles are combined and Sharkoxy picks the fastest.' : ''}</p>
       <input id="subName" type="text" placeholder="Name (optional), e.g. Work" spellcheck="false" maxlength="40">
       <textarea id="subInput" rows="3" placeholder="https://… or vless://…" spellcheck="false"></textarea>
-      <div class="row">${P.length ? '<button class="btn" data-cancel>Cancel</button>' : ''}<button class="btn pri" data-save ${busyU?'disabled':''}>${busyU ? 'Fetching' : 'Save & fetch'}</button></div></div>`;
+      <div class="row"><button class="btn" data-paste>Paste from clipboard</button>${P.length ? '<button class="btn" data-cancel>Cancel</button>' : ''}<button class="btn pri" data-save ${busyU?'disabled':''}>${busyU ? 'Fetching' : 'Save & fetch'}</button></div></div>`;
   } else {
     sc = `<div class="cap" style="margin-bottom:10px">Profiles</div>` + P.map(p =>
       `<div class="sub-row prof ${p.off?'off':''}"><div class="meta"><b>${esc(p.name)}</b><span>${p.off ? 'Off' : p.count + ' servers'}${p.updated ? ' · ' + esc(p.updated) : ''}</span></div>
@@ -955,6 +1001,7 @@ function render(){
       <div class="grp-t">Subscription</div>
       <div class="grp">
         <div class="set"><div><b>Refresh subscriptions every 12 hours</b><span>Keeps your server lists current</span></div>${sw('autoUpdate', s.autoUpdate)}</div>
+        <div class="set"><div><b>Open clash:// and sing-box:// links</b><span>For "Import to Clash" buttons on provider websites. sharkoxy:// links always work</span></div>${sw('linkall', !!s.linkAll)}</div>
         <div class="set"><div><b>Shark animation when connecting</b><span>A short popup while the connection is made</span></div>${sw('anim', !s.noAnim)}</div>
         <div class="set"><div><b>Keep Sharkoxy up to date</b><span>Downloads signed updates in the background and asks before restarting</span></div>${sw('selfUpdate', s.selfUpdate)}</div>
       </div>
@@ -1023,7 +1070,7 @@ $('retest').onclick = () => act('/api/test');
 $('modal').addEventListener('mousedown', e => { if(e.target === $('modal')){ showSettings = false; render(); } });
 document.addEventListener('keydown', e => { if(e.key === 'Escape' && showSettings){ showSettings = false; render(); } });
 document.addEventListener('click', e => {
-  const t = e.target.closest('[data-auto],[data-install],[data-folder],[data-save],[data-cancel],[data-pupdate],[data-ptoggle],[data-pdel],[data-pall],[data-applyupd],[data-edit],[data-quit],[data-close],[data-check],[data-mode],[data-pin],[data-zoom],[data-secs],.node.can');
+  const t = e.target.closest('[data-auto],[data-install],[data-folder],[data-save],[data-paste],[data-cancel],[data-pupdate],[data-ptoggle],[data-pdel],[data-pall],[data-applyupd],[data-edit],[data-quit],[data-close],[data-check],[data-mode],[data-pin],[data-zoom],[data-secs],.node.can');
   if(!t) return;
   if(t.matches('[data-auto]')) act('/api/select', {id: 'auto'});
   else if(t.matches('[data-install]')) act('/api/core/install');
@@ -1033,6 +1080,7 @@ document.addEventListener('click', e => {
   else if(t.matches('[data-secs]')) act('/api/settings', {checkSecs: +t.dataset.secs});
   else if(t.matches('[data-zoom]')){ const [u,v] = t.dataset.zoom.split(',').map(Number); flyTo(V.z * 2.6, u, v); }
   else if(t.matches('[data-pin]')){ if(S.connected) act('/api/select', {id: t.dataset.pin}); }
+  else if(t.matches('[data-paste]')){ call('/api/clipboard', {}).then(r => { const el = $('subInput'); if(el && r.text){ el.value = r.text; } else if(el){ el.placeholder = 'Clipboard is empty - copy your link first'; } }).catch(() => {}); }
   else if(t.matches('[data-save]')){ const v = $('subInput').value.trim(); if(v){ editSub = false; act('/api/profile', {action:'add', input: v, name: $('subName').value.trim()}); } }
   else if(t.matches('[data-cancel]')){ editSub = false; render(); }
   else if(t.matches('[data-pupdate]')) act('/api/profile', {action:'update', id: t.dataset.pupdate});
@@ -1047,6 +1095,7 @@ document.addEventListener('click', e => {
 });
 document.addEventListener('change', e => {
   const el = e.target, id = el.id;
+  if(id === 'linkall') act('/api/settings', {linkAll: el.checked});
   if(id === 'anim') act('/api/settings', {noAnim: !el.checked});
   else if(['sysProxy','autoStart','autoConnect','autoUpdate','selfUpdate','lan','clashApi'].includes(id)) act('/api/settings', {[id]: el.checked});
   else if(['testUrl','mirror','directList','proxyList'].includes(id)) act('/api/settings', {[id]: el.value});

@@ -26,3 +26,6 @@ func sysProxyIs(addr string) bool { return true }
 
 func swapExe(newPath string) error { return errors.New("self-update is Windows only for now") }
 func restartSelf(show bool) bool   { return false }
+
+func registerProtocols(all bool) {}
+func readClipboard() string      { return "" }

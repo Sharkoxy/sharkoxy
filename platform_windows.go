@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"syscall"
+	"unsafe"
 )
 
 func hideWindow(c *exec.Cmd) {
@@ -165,4 +166,64 @@ func restartSelf(show bool) bool {
 	c.Env = append(os.Environ(), "SHARKOXY_RESTART=1")
 	hideWindow(c)
 	return c.Start() == nil
+}
+
+// registerProtocols makes links like sharkoxy://add?url=... open this app. clash:// and sing-box:// are only
+// claimed when the person asks for it, so we never steal them from another client by surprise.
+func registerProtocols(all bool) {
+	exe, err := os.Executable()
+	if err != nil {
+		return
+	}
+	cmd := `"` + exe + `" "%1"`
+	schemes := []string{"sharkoxy"}
+	if all {
+		schemes = append(schemes, "clash", "sing-box")
+	}
+	for _, s := range schemes {
+		k := `HKCU\Software\Classes\` + s
+		_ = reg("add", k, "/ve", "/d", "URL:Sharkoxy", "/f")
+		_ = reg("add", k, "/v", "URL Protocol", "/d", "", "/f")
+		_ = reg("add", k+`\shell\open\command`, "/ve", "/d", cmd, "/f")
+	}
+	if !all { // give them back if we had them
+		for _, s := range []string{"clash", "sing-box"} {
+			k := `HKCU\Software\Classes\` + s
+			c := exec.Command("reg", "query", k+`\shell\open\command`, "/ve")
+			hideWindow(c)
+			if out, err := c.Output(); err == nil && strings.Contains(string(out), "Sharkoxy") {
+				_ = reg("delete", k, "/f")
+			}
+		}
+	}
+}
+
+// readClipboard returns the text on the clipboard (empty if there is none).
+func readClipboard() string {
+	u32 := syscall.NewLazyDLL("user32.dll")
+	k32 := syscall.NewLazyDLL("kernel32.dll")
+	open, closeC, get := u32.NewProc("OpenClipboard"), u32.NewProc("CloseClipboard"), u32.NewProc("GetClipboardData")
+	lock, unlock := k32.NewProc("GlobalLock"), k32.NewProc("GlobalUnlock")
+	if r, _, _ := open.Call(0); r == 0 {
+		return ""
+	}
+	defer closeC.Call()
+	h, _, _ := get.Call(13) // CF_UNICODETEXT
+	if h == 0 {
+		return ""
+	}
+	p, _, _ := lock.Call(h)
+	if p == 0 {
+		return ""
+	}
+	defer unlock.Call(h)
+	var u []uint16
+	for i := 0; i < 16384; i++ {
+		c := *(*uint16)(unsafe.Pointer(p + uintptr(i)*2))
+		if c == 0 {
+			break
+		}
+		u = append(u, c)
+	}
+	return syscall.UTF16ToString(u)
 }

@@ -25,6 +25,9 @@ func (a *App) routes() http.Handler {
 	mux.HandleFunc("/api/quit", a.guard(a.handleQuit))
 	mux.HandleFunc("/_show", a.handleShow)
 	mux.HandleFunc("/_quit", a.handleQuitExt)
+	mux.HandleFunc("/_import", a.handleImportExt)
+	mux.HandleFunc("/api/import", a.guard(a.handleImport))
+	mux.HandleFunc("/api/clipboard", a.guard(a.handleClipboard))
 	return mux
 }
 
@@ -137,6 +140,7 @@ func (a *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 		SelfUpdate  *bool   `json:"selfUpdate"`
 		Theme       *string `json:"theme"`
 		NoAnim      *bool   `json:"noAnim"`
+		LinkAll     *bool   `json:"linkAll"`
 	}
 	_ = json.NewDecoder(r.Body).Decode(&req)
 
@@ -188,6 +192,10 @@ func (a *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 				defer themeHook()
 			}
 		}
+	}
+	if req.LinkAll != nil {
+		a.set.LinkAll = *req.LinkAll
+		go registerProtocols(*req.LinkAll)
 	}
 	if req.NoAnim != nil {
 		a.set.NoAnim = *req.NoAnim

@@ -336,3 +336,22 @@ func TestClashBlockStyle(t *testing.T) {
 		t.Errorf("empty proxies should error")
 	}
 }
+
+func TestParseDeepLink(t *testing.T) {
+	ok := map[string][2]string{
+		"sharkoxy://add?url=https%3A%2F%2Fa.example%2Fsub%3Ftoken%3D1&name=Work": {"https://a.example/sub?token=1", "Work"},
+		"clash://install-config?url=https%3A%2F%2Fa.example%2Fx":                  {"https://a.example/x", ""},
+		"sing-box://import-remote-profile?url=https%3A%2F%2Fa.example%2Fx#Home":   {"https://a.example/x", "Home"},
+	}
+	for in, want := range ok {
+		u, n, err := parseDeepLink(in)
+		if err != nil || u != want[0] || n != want[1] {
+			t.Errorf("%s -> %q %q %v", in, u, n, err)
+		}
+	}
+	for _, bad := range []string{"https://a.example", "sharkoxy://add", "sharkoxy://add?url=file%3A%2F%2F%2Fc", "sharkoxy://add?url=javascript%3Aalert(1)", "evil://add?url=https%3A%2F%2Fa"} {
+		if _, _, err := parseDeepLink(bad); err == nil {
+			t.Errorf("accepted %s", bad)
+		}
+	}
+}

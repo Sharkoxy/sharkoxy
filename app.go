@@ -43,6 +43,7 @@ type Settings struct {
 	Welcomed    bool      `json:"welcomed"`   // first-run thank-you popup already shown
 	Theme       string    `json:"theme"`      // "", "pixel" or "apple" ("" = not chosen yet)
 	NoAnim      bool      `json:"noAnim"`     // turn off the connecting animation popup
+	LinkAll     bool      `json:"linkAll"`    // also open clash:// and sing-box:// links
 	SelfUpdate  bool      `json:"selfUpdate"` // download signed app updates
 	V           int       `json:"v"`          // settings version, for upgrades
 }
@@ -104,6 +105,8 @@ type App struct {
 	pinned         bool
 	userPin        string // node the user picked by hand ("" = automatic)
 	liveMS         int    // last real request through the proxy
+	hist           []histPt
+	importReq      *pendingImport
 	lastRefresh    time.Time
 	lastSwitch     time.Time
 	startedAt      time.Time
@@ -453,6 +456,10 @@ func (a *App) streamTraffic(ctx context.Context, port int, secret string) {
 		if json.Unmarshal(sc.Bytes(), &t) == nil {
 			a.mu.Lock()
 			a.up, a.down = t.Up, t.Down
+			a.hist = append(a.hist, histPt{t.Down, t.Up, a.liveMS})
+			if len(a.hist) > 90 {
+				a.hist = a.hist[len(a.hist)-90:]
+			}
 			a.mu.Unlock()
 		}
 	}
@@ -662,8 +669,21 @@ type nodeView struct {
 	Src    string  `json:"src"`
 }
 
+type histPt struct {
+	D int64 `json:"d"`
+	U int64 `json:"u"`
+	P int   `json:"p"`
+}
+
+type importView struct {
+	URL  string `json:"url"`
+	Name string `json:"name"`
+}
+
 type stateView struct {
-	Version string `json:"version"`
+	Hist    []histPt    `json:"hist"`
+	Import  *importView `json:"import,omitempty"`
+	Version string      `json:"version"`
 	Core    struct {
 		Installed   bool   `json:"installed"`
 		Version     string `json:"version"`
@@ -703,6 +723,7 @@ type stateView struct {
 		SelfUpdate  bool   `json:"selfUpdate"`
 		Theme       string `json:"theme"`
 		NoAnim      bool   `json:"noAnim"`
+		LinkAll     bool   `json:"linkAll"`
 	} `json:"settings"`
 	Update struct {
 		Available string `json:"available"`
@@ -737,6 +758,11 @@ func (a *App) stateView() stateView {
 	v.Pinned, v.Active, v.Live = a.pinned, a.active, a.liveMS
 	v.NetDown = a.netDown
 	v.Up, v.Down = a.up, a.down
+	v.Hist = append([]histPt(nil), a.hist...)
+	if p := a.importReq; p != nil {
+		v.Import = &importView{URL: p.URL, Name: p.Name}
+	}
+	v.Settings.LinkAll = a.set.LinkAll
 	v.Checks, v.Checking = a.checks, a.checking
 	v.Nodes = make([]nodeView, 0, len(a.nodes))
 	for _, n := range a.nodes {
