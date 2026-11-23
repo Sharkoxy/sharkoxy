@@ -40,6 +40,7 @@ type Settings struct {
 	CheckSecs   int       `json:"checkSecs"` // how often the fastest server is re-checked
 	ClashAPI    bool      `json:"clashApi"`  // expose a Clash-compatible controller for dashboards
 	APISecret   string    `json:"apiSecret"`
+	LastVer     string    `json:"lastVer"`    // version whose "what's new" popup was last shown
 	Welcomed    bool      `json:"welcomed"`   // first-run thank-you popup already shown
 	Theme       string    `json:"theme"`      // "", "pixel" or "apple" ("" = not chosen yet)
 	NoAnim      bool      `json:"noAnim"`     // turn off the connecting animation popup
@@ -222,7 +223,7 @@ func (a *App) apiCall(method, path string, body any, timeout time.Duration, out 
 	if body != nil {
 		req.Header.Set("Content-Type", "application/json")
 	}
-	c := &http.Client{Timeout: timeout, Transport: &http.Transport{Proxy: nil}}
+	c := &http.Client{Timeout: timeout, Transport: &http.Transport{Proxy: nil, DisableKeepAlives: true}}
 	resp, err := c.Do(req)
 	if err != nil {
 		return err
@@ -451,7 +452,7 @@ func (a *App) streamTraffic(ctx context.Context, port int, secret string) {
 		return
 	}
 	req.Header.Set("Authorization", "Bearer "+secret)
-	resp, err := (&http.Client{Transport: &http.Transport{Proxy: nil}}).Do(req)
+	resp, err := (&http.Client{Transport: &http.Transport{Proxy: nil, DisableKeepAlives: true}}).Do(req)
 	if err != nil {
 		return
 	}
@@ -740,10 +741,11 @@ type stateView struct {
 		Notes     string `json:"notes"`
 		Err       string `json:"err"`
 	} `json:"update"`
-	Welcomed   bool   `json:"welcomed"`
-	Proxy      string `json:"proxy"`
-	Controller string `json:"controller"` // Clash-compatible API address (when enabled)
-	Secret     string `json:"secret"`
+	WhatsNew   *whatsNew `json:"whatsNew,omitempty"`
+	Welcomed   bool      `json:"welcomed"`
+	Proxy      string    `json:"proxy"`
+	Controller string    `json:"controller"` // Clash-compatible API address (when enabled)
+	Secret     string    `json:"secret"`
 }
 
 func (a *App) stateView() stateView {
@@ -790,6 +792,9 @@ func (a *App) stateView() stateView {
 	}
 	s := a.set
 	v.Welcomed = s.Welcomed
+	if s.LastVer != version && s.Welcomed {
+		v.WhatsNew = &whatsNew{Version: version, Notes: changelog[version]}
+	}
 	v.Update.Available, v.Update.Ready, v.Update.Notes, v.Update.Err = a.upd.Available, a.upd.Ready, a.upd.Notes, a.upd.Err
 	v.Settings.SelfUpdate = s.SelfUpdate
 	v.Settings.Theme = s.Theme

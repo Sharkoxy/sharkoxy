@@ -137,6 +137,7 @@ func (a *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 		CheckSecs   *int    `json:"checkSecs"`
 		ClashAPI    *bool   `json:"clashApi"`
 		Welcomed    *bool   `json:"welcomed"`
+		SeenVersion *bool   `json:"seenVersion"`
 		SelfUpdate  *bool   `json:"selfUpdate"`
 		Theme       *string `json:"theme"`
 		NoAnim      *bool   `json:"noAnim"`
@@ -203,8 +204,14 @@ func (a *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 	if req.SelfUpdate != nil {
 		a.set.SelfUpdate = *req.SelfUpdate
 	}
+	if req.SeenVersion != nil && *req.SeenVersion {
+		a.set.LastVer = version
+	}
 	if req.Welcomed != nil {
 		a.set.Welcomed = *req.Welcomed
+		if *req.Welcomed {
+			a.set.LastVer = version // a brand-new install needs no "what's new"
+		}
 	}
 	if req.Mirror != nil {
 		a.set.Mirror = strings.TrimSpace(*req.Mirror)

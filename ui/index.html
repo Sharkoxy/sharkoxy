@@ -434,6 +434,7 @@ html[data-theme="apple"] .alogo svg{border-radius:22px}
 <div class="modal hidden" id="modal"><div class="sheet" id="sheet"></div></div>
 <div class="modal hidden" id="amodal"><div class="sheet" id="asheet"></div></div>
 <div class="modal hidden" id="smodal"><div class="sheet sanim"><canvas id="stage" class="stage" aria-hidden="true"></canvas><div id="stext" class="stext"></div></div></div>
+<div class="modal hidden" id="nmodal"><div class="sheet" id="nsheet"></div></div>
 <div class="modal hidden" id="imodal"><div class="sheet" id="isheet"></div></div>
 <div class="modal hidden" id="tmodal"><div class="sheet" id="tsheet"></div></div>
 
@@ -835,6 +836,24 @@ function sparkline(h){
     <div class="sparkl num"><span>last ${n}s</span><span>${avg ? 'avg ping ' + avg + ' ms' : ''}</span><span>peak ${fmtSpeed(mx > 1024 ? mx : 0)}</span></div>`;
 }
 let importShown = '';
+let newsDone = false;
+function renderNews(){
+  const m = $('nmodal'), w = S && S.whatsNew;
+  if(!w || newsDone || (S.import) || !S.welcomed){ if(!w) m.classList.add('hidden'); return; }
+  if(!m.classList.contains('hidden')) return;
+  const q = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  $('nsheet').innerHTML = `<div class="sheet-h"><h2>UPDATED TO ${q(w.version)}!</h2></div>
+    <p style="margin-bottom:8px"><b>What's new</b></p>
+    <ul style="margin:0 0 12px 18px;line-height:1.5">${(w.notes||['Small fixes and improvements.']).map(n => '<li>'+q(n)+'</li>').join('')}</ul>
+    <p style="margin-bottom:12px">Thank you for using Sharkoxy and for helping it grow. - Shahriar</p>
+    <div class="row"><button class="btn pri" data-newsok>Awesome!</button></div>`;
+  m.classList.remove('hidden');
+}
+document.addEventListener('click', e => {
+  if(!e.target.closest('[data-newsok]')) return;
+  newsDone = true; $('nmodal').classList.add('hidden');
+  call('/api/settings', {seenVersion: true}).catch(() => {});
+});
 function renderImport(){
   const m = $('imodal'), p = S && S.import;
   if(!p){ m.classList.add('hidden'); importShown = ''; return; }
@@ -897,6 +916,7 @@ function render(){
   setHTML($('speed'), S.connected ? `<span>↓ <b>${fmtSpeed(S.down)}</b></span><span>↑ <b>${fmtSpeed(S.up)}</b></span>` : '');
   setHTML($('spark'), S.connected ? sparkline(S.hist||[]) : '');
   renderImport();
+  renderNews();
   setHTML($('live'), S.connected && S.live > 0 ? `last real request: ${S.live} ms` : '');
 
   // banner

@@ -238,7 +238,7 @@ func (a *App) resolveGeo() {
 	if len(ips) == 0 {
 		return
 	}
-	tr := &http.Transport{Proxy: nil}
+	tr := &http.Transport{Proxy: nil, DisableKeepAlives: true}
 	if running {
 		if pu, err := url.Parse("http://127.0.0.1:" + itoa(port)); err == nil {
 			tr.Proxy = http.ProxyURL(pu)

@@ -18,7 +18,7 @@ var indexHTML string
 
 const (
 	uiPort  = 17800
-	version = "1.7.1"
+	version = "1.7.2"
 )
 
 var dataDir string
@@ -33,7 +33,7 @@ func pingShow() bool {
 		return false
 	}
 	req.Header.Set("X-Sharkoxy", "1")
-	resp, err := (&http.Client{Timeout: 3 * time.Second, Transport: &http.Transport{Proxy: nil}}).Do(req)
+	resp, err := (&http.Client{Timeout: 3 * time.Second, Transport: &http.Transport{Proxy: nil, DisableKeepAlives: true}}).Do(req)
 	if err != nil {
 		return false
 	}
@@ -91,7 +91,7 @@ func main() {
 	if l := firstDeepLink(flag.Args()); l != "" {
 		_ = app.queueImport(l)
 	}
-	srv := &http.Server{Handler: app.routes(), ReadHeaderTimeout: 10 * time.Second}
+	srv := &http.Server{Handler: app.routes(), ReadHeaderTimeout: 10 * time.Second, IdleTimeout: 60 * time.Second}
 	go func() { log.Println("server:", srv.Serve(ln)) }()
 
 	sig := make(chan os.Signal, 1)

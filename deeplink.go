@@ -78,7 +78,7 @@ func postImport(link string) bool {
 		return false
 	}
 	req.Header.Set("X-Sharkoxy", "1")
-	resp, err := (&http.Client{Timeout: 3 * time.Second, Transport: &http.Transport{Proxy: nil}}).Do(req)
+	resp, err := (&http.Client{Timeout: 3 * time.Second, Transport: &http.Transport{Proxy: nil, DisableKeepAlives: true}}).Do(req)
 	if err != nil {
 		return false
 	}
