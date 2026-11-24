@@ -593,11 +593,22 @@ func themeTitleBar(hwnd uintptr) {
 		return
 	}
 	set := func(attr, val uintptr) { pDwmSetAttr.Call(hwnd, attr, uintptr(unsafe.Pointer(&val)), 4) }
-	theme := "pixel"
+	theme := "apple"
 	if shellApp != nil {
 		shellApp.mu.Lock()
 		theme = shellApp.set.Theme
 		shellApp.mu.Unlock()
+	}
+	if theme == "" {
+		theme = "apple" // Clean & Soft is the default look
+	}
+	if theme == "void" { // Midnight: pure black, always dark
+		set(20, 1)
+		set(19, 1)
+		set(35, 0x000000)
+		set(36, 0xDDDDDD)
+		set(34, 0x1A1A1A)
+		return
 	}
 	if theme == "apple" {
 		if windowsDark() {

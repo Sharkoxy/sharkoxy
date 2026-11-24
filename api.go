@@ -12,6 +12,7 @@ func (a *App) routes() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", a.handleIndex)
 	mux.HandleFunc("/api/state", a.guard(a.handleState))
+	mux.HandleFunc("/api/update/check", a.guard(a.handleUpdateCheck))
 	mux.HandleFunc("/api/update/apply", a.guard(a.handleUpdateApply))
 	mux.HandleFunc("/api/profile", a.guard(a.handleProfile))
 	mux.HandleFunc("/api/connect", a.guard(a.handleConnect))
@@ -186,7 +187,7 @@ func (a *App) handleSettings(w http.ResponseWriter, r *http.Request) {
 	if req.AutoUpdate != nil {
 		a.set.AutoUpdate = *req.AutoUpdate
 	}
-	if req.Theme != nil && (*req.Theme == "pixel" || *req.Theme == "apple") {
+	if req.Theme != nil && (*req.Theme == "pixel" || *req.Theme == "apple" || *req.Theme == "void") {
 		if a.set.Theme != *req.Theme {
 			a.set.Theme = *req.Theme
 			if themeHook != nil {
@@ -284,12 +285,15 @@ func (a *App) handleShow(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("ok"))
 }
 
-// themeAttr is the theme the page should open with (no flash of the wrong look). Not chosen yet = pixel.
+// themeAttr is the theme the page should open with (no flash of the wrong look). Not chosen yet = Clean & Soft.
 func (a *App) themeAttr() string {
 	a.mu.Lock()
 	defer a.mu.Unlock()
-	if a.set.Theme == "apple" {
-		return "apple"
+	switch a.set.Theme {
+	case "pixel":
+		return "pixel"
+	case "void":
+		return `apple" data-tone="void` // Midnight = Clean & Soft layout with its own colours
 	}
-	return "pixel"
+	return "apple"
 }

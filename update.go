@@ -44,6 +44,7 @@ type updateState struct {
 	Ready     bool   // downloaded, verified, waiting for a restart
 	Err       string // last check error (quiet, shown only in Settings)
 	Checking  bool
+	Checked   string
 }
 
 func (a *App) updateDir() string { return filepath.Join(dataDir, "update") }
@@ -153,6 +154,7 @@ func (a *App) checkUpdate() {
 	err := a.doCheckUpdate()
 	a.mu.Lock()
 	a.upd.Checking = false
+	a.upd.Checked = time.Now().Format("15:04")
 	if err != nil {
 		a.upd.Err = err.Error()
 		log.Println("update check:", err)
@@ -300,14 +302,26 @@ func (a *App) handleUpdateApply(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) updateLoop() {
-	time.Sleep(90 * time.Second)
+	time.Sleep(45 * time.Second)
 	for {
 		a.mu.Lock()
 		on := a.set.SelfUpdate
 		a.mu.Unlock()
+		wait := 2 * time.Hour
 		if on {
 			a.checkUpdate()
+			a.mu.Lock()
+			if a.upd.Err != "" {
+				wait = 10 * time.Minute // GitHub may be unreachable right now: try again soon
+			}
+			a.mu.Unlock()
 		}
-		time.Sleep(6 * time.Hour)
+		time.Sleep(wait)
 	}
+}
+
+// handleUpdateCheck: the "Check for updates" button.
+func (a *App) handleUpdateCheck(w http.ResponseWriter, r *http.Request) {
+	go a.checkUpdate()
+	a.reply(w)
 }

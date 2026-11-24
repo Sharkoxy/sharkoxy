@@ -42,7 +42,7 @@ type Settings struct {
 	APISecret   string    `json:"apiSecret"`
 	LastVer     string    `json:"lastVer"`    // version whose "what's new" popup was last shown
 	Welcomed    bool      `json:"welcomed"`   // first-run thank-you popup already shown
-	Theme       string    `json:"theme"`      // "", "pixel" or "apple" ("" = not chosen yet)
+	Theme       string    `json:"theme"`      // "", "pixel", "apple" or "void" ("" = not chosen yet = apple)
 	NoAnim      bool      `json:"noAnim"`     // turn off the connecting animation popup
 	LinkAll     bool      `json:"linkAll"`    // also open clash:// and sing-box:// links
 	SelfUpdate  bool      `json:"selfUpdate"` // download signed app updates
@@ -740,6 +740,8 @@ type stateView struct {
 		Ready     bool   `json:"ready"`
 		Notes     string `json:"notes"`
 		Err       string `json:"err"`
+		Checking  bool   `json:"checking"`
+		Checked   string `json:"checked"`
 	} `json:"update"`
 	WhatsNew   *whatsNew `json:"whatsNew,omitempty"`
 	Welcomed   bool      `json:"welcomed"`
@@ -796,6 +798,7 @@ func (a *App) stateView() stateView {
 		v.WhatsNew = &whatsNew{Version: version, Notes: changelog[version]}
 	}
 	v.Update.Available, v.Update.Ready, v.Update.Notes, v.Update.Err = a.upd.Available, a.upd.Ready, a.upd.Notes, a.upd.Err
+	v.Update.Checking, v.Update.Checked = a.upd.Checking, a.upd.Checked
 	v.Settings.SelfUpdate = s.SelfUpdate
 	v.Settings.Theme = s.Theme
 	v.Settings.NoAnim = s.NoAnim

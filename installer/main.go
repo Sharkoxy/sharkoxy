@@ -42,7 +42,27 @@ const (
 	idYes                                                  = 6
 )
 
+// silent mode (for scripts and package managers): /S, /silent, /quiet or /VERYSILENT. No windows, answers are the safe defaults.
+var silent = func() bool {
+	for _, a := range os.Args[1:] {
+		switch strings.ToLower(a) {
+		case "/s", "-s", "/silent", "-silent", "/quiet", "/verysilent", "/qn":
+			return true
+		}
+	}
+	return false
+}()
+
 func msgBox(title, text string, flags uintptr) int {
+	if silent {
+		if flags&mbDefault2 != 0 {
+			return 7 // "No": keep the person's data
+		}
+		if flags&0xF != mbYesNo {
+			return 1 // OK
+		}
+		return idYes
+	}
 	t, _ := syscall.UTF16PtrFromString(text)
 	c, _ := syscall.UTF16PtrFromString(title)
 	r, _, _ := msgBoxProc.Call(0, uintptr(unsafe.Pointer(t)), uintptr(unsafe.Pointer(c)), flags|0x10000) // MB_SETFOREGROUND
@@ -222,7 +242,7 @@ func main() {
 	if _, err := os.Stat(filepath.Join(installDir(), "sing-box.exe")); err != nil {
 		note = "\n\nNote: sing-box.exe was not included. Sharkoxy will ask to download it on first start."
 	}
-	if msgBox("Sharkoxy Setup", "Sharkoxy is installed."+note+"\n\nStart it now?", mbYesNo|mbIconInfo) == idYes {
+	if !silent && msgBox("Sharkoxy Setup", "Sharkoxy is installed."+note+"\n\nStart it now?", mbYesNo|mbIconInfo) == idYes {
 		_ = exec.Command(filepath.Join(installDir(), "Sharkoxy.exe")).Start()
 	}
 }

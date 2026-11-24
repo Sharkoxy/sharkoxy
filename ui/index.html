@@ -83,7 +83,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .speed{display:flex;gap:20px;justify-content:center;margin-top:8px;font-size:22px;color:var(--text2);min-height:22px}
 .speed b{color:var(--white);font-weight:400}
 #isheet .row{display:flex;gap:10px;margin-top:6px}
-.spark{margin:10px auto 0;max-width:340px;height:44px}
+.spark{margin:12px auto 0;max-width:340px}
 .spark svg{width:100%;height:44px;display:block}
 .spark .gd{fill:none;stroke:var(--green);stroke-width:2;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
 .spark .gu{fill:none;stroke:var(--blue);stroke-width:2;vector-effect:non-scaling-stroke;shape-rendering:crispEdges}
@@ -91,7 +91,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 .spark .gp{fill:none;stroke:var(--yellow);stroke-width:1.5;vector-effect:non-scaling-stroke;opacity:.8}
 .sparkl{display:flex;justify-content:space-between;font-size:15px;color:var(--text3);max-width:340px;margin:2px auto 0}
 html[data-theme="apple"] .spark .gd,html[data-theme="apple"] .spark .gu,html[data-theme="apple"] .spark .gp{shape-rendering:auto;stroke-linejoin:round;stroke-linecap:round}
-.live{font-size:19px;color:var(--text3);min-height:20px}
+.live{font-size:19px;color:var(--text3);min-height:20px;margin-top:8px}
 
 /* controls */
 .btn{padding:11px 14px;font:9px/1.2 var(--px);background:var(--lav);color:var(--white);white-space:nowrap;text-transform:uppercase;
@@ -368,8 +368,68 @@ html[data-theme="apple"] .alogo svg{border-radius:22px}
 .tprev{height:92px;display:grid;place-items:center;overflow:hidden}
 .tprev.px{background:#0c0a1f;box-shadow:inset 0 0 0 3px #83769c}
 .tprev.px i{display:block;width:44px;height:44px;background:#00e436;box-shadow:inset -5px -5px 0 rgba(0,0,0,.3),0 0 0 3px #000}
+.tprev.vd{background:#000;border-radius:14px;box-shadow:inset 0 0 0 1px #222}
+.tprev.vd i{display:block;width:40px;height:40px;border-radius:50%;background:none;box-shadow:inset 0 0 0 2px #3ddc84}
 .tprev.ap{background:linear-gradient(135deg,#f2f2f7,#dde8f6);border-radius:14px}
 .tprev.ap i{display:block;width:48px;height:48px;border-radius:50%;background:#34c759;box-shadow:0 8px 20px rgba(52,199,89,.4)}
+
+/* ---------- Midnight (html[data-theme="apple"][data-tone="void"]): minimal, pure black ---------- */
+html[data-theme="apple"][data-tone="void"]{
+  --bg:#000; --panel:#0b0b0b; --panel2:#111; --bd:#1c1c1c;
+  --text:#e6e6e6; --text2:#8a8a8a; --text3:#555; --k:#141414; --white:#e6e6e6; --lgray:#8a8a8a;
+  --gray:#2a2a2a; --navy:#161616; --lav:#1c1c1c; --plum:transparent;
+  --yellow:#e6e6e6; --green:#3ddc84; --blue:#9a9a9a; --orange:#c9a227; --red:#e5484d; --pink:#e5484d; --ocean:#050505;
+  --land:#1f1f1f; --land2:#2b2b2b; --grat:rgba(255,255,255,.05);
+  --shadow:none; color-scheme:dark;
+}
+html[data-theme="apple"][data-tone="void"] .card{backdrop-filter:none;border-radius:14px;background:var(--panel)}
+html[data-theme="apple"][data-tone="void"] .bar{backdrop-filter:none;background:#000;border-bottom:1px solid var(--bd)}
+html[data-theme="apple"][data-tone="void"] .power{background:transparent;box-shadow:inset 0 0 0 1.5px #2a2a2a;color:#777}
+html[data-theme="apple"][data-tone="void"] .power:hover:not(:disabled){background:transparent;box-shadow:inset 0 0 0 1.5px #555;color:#ddd}
+html[data-theme="apple"][data-tone="void"] .power.on{background:transparent;color:var(--green);box-shadow:inset 0 0 0 1.5px var(--green),0 0 28px rgba(61,220,132,.16)}
+html[data-theme="apple"][data-tone="void"] .power.on:hover:not(:disabled){background:transparent;color:var(--green);filter:none}
+html[data-theme="apple"][data-tone="void"] .power.busy{background:transparent;color:var(--orange);box-shadow:inset 0 0 0 1.5px var(--orange)}
+html[data-theme="apple"][data-tone="void"] .status{font-weight:500;letter-spacing:.14em;font-size:15px;text-transform:uppercase}
+html[data-theme="apple"][data-tone="void"] .spark .gf{opacity:.07}
+html[data-theme="apple"][data-tone="void"] .spark .gd{stroke:var(--green);stroke-width:1.5}
+html[data-theme="apple"][data-tone="void"] .spark .gu{stroke:#8a8a8a;stroke-width:1.5}
+html[data-theme="apple"][data-tone="void"] .btn.pri{background:#e6e6e6;color:#000}
+html[data-theme="apple"][data-tone="void"] .sheet{background:#0b0b0b;border-color:#1c1c1c}
+html[data-theme="apple"][data-tone="void"] .node.act{background:#111;box-shadow:inset 2px 0 0 var(--green)}
+html[data-theme="apple"][data-tone="void"] .chip{background:transparent;color:var(--text2);box-shadow:inset 0 0 0 1px #222}
+html[data-theme="apple"][data-tone="void"] .chip.good,html[data-theme="apple"][data-tone="void"] .chip.on{color:var(--green)}
+.cozy{display:block;width:100%;max-width:288px;margin:0 auto 14px;image-rendering:pixelated}
+.cozy .st{opacity:0;animation:stm 2.4s steps(6,end) infinite}.cozy .st1{animation-delay:.8s}.cozy .st2{animation-delay:1.6s}
+@keyframes stm{0%{opacity:1;transform:translateY(0)}80%{opacity:1}100%{opacity:0;transform:translateY(-6px)}}
+.cozy .ta{animation:fa 1.2s steps(1,end) infinite}.cozy .tb{animation:fb 1.2s steps(1,end) infinite}
+@keyframes fa{0%{opacity:1}50%{opacity:0}}@keyframes fb{0%{opacity:0}50%{opacity:1}}
+.cozy .bl{opacity:0;animation:bk 4s steps(1,end) infinite}
+@keyframes bk{0%,92%{opacity:0}94%,98%{opacity:1}100%{opacity:0}}
+.cozy .tw{animation:twk 1.6s steps(1,end) infinite}.cozy .t1{animation-delay:.5s}.cozy .t2{animation-delay:1s}
+@keyframes twk{0%{opacity:1}50%{opacity:.15}}
+@media (prefers-reduced-motion:reduce){.cozy *{animation:none!important}.cozy .st{opacity:1}.cozy .tb{opacity:0}.cozy .ta{opacity:1}}
+
+/* Midnight is its own design: monospace, square, hairlines, no fills */
+html[data-theme="apple"][data-tone="void"]{--px:ui-monospace,"Cascadia Mono","SF Mono",Consolas,"Liberation Mono",monospace;--vt:var(--px)}
+html[data-theme="apple"][data-tone="void"] body{font:13px/1.5 var(--px);letter-spacing:0}
+html[data-theme="apple"][data-tone="void"] .card{background:transparent;border:1px solid #232323;border-radius:2px}
+html[data-theme="apple"][data-tone="void"] .brand{font:600 13px var(--px);letter-spacing:.28em;text-transform:uppercase}
+html[data-theme="apple"][data-tone="void"] .logo{border-radius:0;filter:grayscale(1) contrast(1.1)}
+html[data-theme="apple"][data-tone="void"] .cap{font:500 11px var(--px);letter-spacing:.2em;text-transform:uppercase;color:#6a6a6a}
+html[data-theme="apple"][data-tone="void"] .cap::before{content:"// ";color:#444}
+html[data-theme="apple"][data-tone="void"] .power{width:96px;height:96px;border-radius:0;box-shadow:inset 0 0 0 1px #3a3a3a;transform:none}
+html[data-theme="apple"][data-tone="void"] .power.on{box-shadow:inset 0 0 0 1px var(--green);background:rgba(61,220,132,.05)}
+html[data-theme="apple"][data-tone="void"] .power svg{width:36px;height:36px}
+html[data-theme="apple"][data-tone="void"] .status{font:500 13px var(--px);letter-spacing:.4em}
+html[data-theme="apple"][data-tone="void"] .status::before{content:"[ "}html[data-theme="apple"][data-tone="void"] .status::after{content:" ]"}
+html[data-theme="apple"][data-tone="void"] .chip{border-radius:0;box-shadow:none;background:none;padding:2px 0;color:var(--text2);font:500 12px var(--px)}
+html[data-theme="apple"][data-tone="void"] .chip::before{content:"› ";color:#444}
+html[data-theme="apple"][data-tone="void"] .node{border-radius:0;background:transparent;border:0;border-bottom:1px solid #161616}
+html[data-theme="apple"][data-tone="void"] .btn,html[data-theme="apple"][data-tone="void"] .seg button,html[data-theme="apple"][data-tone="void"] .seg{border-radius:0}
+html[data-theme="apple"][data-tone="void"] .btn{background:transparent;box-shadow:inset 0 0 0 1px #333;color:var(--text)}
+html[data-theme="apple"][data-tone="void"] .btn.pri{background:var(--text);color:#000;box-shadow:none}
+html[data-theme="apple"][data-tone="void"] .sheet,html[data-theme="apple"][data-tone="void"] .banner,html[data-theme="apple"][data-tone="void"] .edit{border-radius:0}
+html[data-theme="apple"][data-tone="void"] .ibtn{border-radius:0}
 </style>
 </head>
 <body>
@@ -793,19 +853,23 @@ $('smodal').addEventListener('click', closeAnim);
 /* ---------- themes ---------- */
 let showTheme = false, themeAsked = false;
 function applyTheme(t){
-  t = t === 'apple' ? 'apple' : 'pixel';
-  if(document.documentElement.dataset.theme !== t){ document.documentElement.dataset.theme = t; try{ drawMap(); }catch(e){} }
+  t = t === 'pixel' ? 'pixel' : t === 'void' ? 'void' : 'apple';
+  const el = document.documentElement, base = t === 'pixel' ? 'pixel' : 'apple', tone = t === 'void' ? 'void' : '';
+  if(el.dataset.theme !== base || (el.dataset.tone || '') !== tone){
+    el.dataset.theme = base; if(tone) el.dataset.tone = tone; else delete el.dataset.tone;
+    try{ drawMap(); }catch(e){}
+  }
 }
 function themeCards(cur){
   const opt = (id, name, note, cls) => `<button class="theme-opt ${cur===id?'on':''}" data-pick="${id}"><div class="tprev ${cls}"><i></i></div><b>${name}</b><small style="opacity:.7">${note}</small></button>`;
-  return `<div class="themes">${opt('pixel','8-bit Arcade','Retro game look, pixel map and mascot','px')}${opt('apple','Clean & Soft','Light, calm and minimal; follows dark mode','ap')}</div>`;
+  return `<div class="themes">${opt('apple','Clean & Soft','Light, calm and friendly; follows dark mode','ap')}${opt('void','Midnight','Ultra-minimal, pure black, easy on the eyes','vd')}${opt('pixel','8-bit Arcade','Retro game look, pixel map and mascot','px')}</div>`;
 }
 function renderTheme(){
   $('tmodal').classList.toggle('hidden', !showTheme);
   if(!showTheme) return;
   setHTML($('tsheet'), `<div class="sheet-h"><h2>CHOOSE YOUR LOOK</h2></div>
     <p style="margin-bottom:4px">Pick how Sharkoxy looks. You can change it any time in Settings.</p>
-    ${themeCards(S.settings.theme || 'pixel')}
+    ${themeCards(S.settings.theme || 'apple')}
     <div class="row" style="display:flex;justify-content:flex-end;margin-top:16px"><button class="btn pri" data-tdone>Continue</button></div>`);
 }
 function pickTheme(t){
@@ -821,7 +885,19 @@ function maybeTheme(){
 document.addEventListener('click', e => {
   const t = e.target.closest('[data-pick],[data-tdone]'); if(!t) return;
   if(t.matches('[data-pick]')) pickTheme(t.dataset.pick);
-  else { showTheme = false; renderTheme(); if(!S.settings.theme) pickTheme('pixel'); }
+  else { showTheme = false; renderTheme(); if(!S.settings.theme) pickTheme('apple'); }
+});
+function updStatus(){
+  const u = S.update || {};
+  if(u.checking) return 'Checking…';
+  if(u.ready) return 'Version ' + esc(u.available) + ' is ready - use the banner on the main screen to restart';
+  if(u.err) return 'Could not check (' + esc(u.err.slice(0, 80)) + '). Connect first, then try again';
+  if(u.available) return 'Downloading version ' + esc(u.available) + '…';
+  return u.checked ? "You're up to date (checked " + esc(u.checked) + ')' : 'Updates are checked automatically';
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-chkupd]'); if(!b) return;
+  b.disabled = true; call('/api/update/check', {}).catch(() => {});
 });
 function sparkline(h){
   if(h.length < 3) return '';
@@ -836,13 +912,14 @@ function sparkline(h){
     <div class="sparkl num"><span>last ${n}s</span><span>${avg ? 'avg ping ' + avg + ' ms' : ''}</span><span>peak ${fmtSpeed(mx > 1024 ? mx : 0)}</span></div>`;
 }
 let importShown = '';
+const COZY = `<svg class="cozy" viewBox="0 0 72 32" shape-rendering="crispEdges" role="img" aria-label="A pixel cat sitting by a window next to a steaming cup of tea"><rect x="2" y="1" width="68" height="25" fill="#5f574f"/><rect x="4" y="3" width="64" height="21" fill="#1d2b53"/><rect x="4" y="19" width="64" height="5" fill="#29366f"/><rect x="4" y="21" width="64" height="3" fill="#3b2d5c"/><rect x="10" y="18" width="6" height="1" fill="#29366f"/><rect x="11" y="17" width="4" height="1" fill="#29366f"/><rect x="24" y="17" width="8" height="1" fill="#29366f"/><rect x="25" y="16" width="6" height="1" fill="#29366f"/><rect x="48" y="18" width="10" height="1" fill="#29366f"/><rect x="50" y="17" width="6" height="1" fill="#29366f"/><rect x="56" y="6" width="3" height="1" fill="#ffec27"/><rect x="55" y="7" width="5" height="1" fill="#ffec27"/><rect x="55" y="8" width="5" height="1" fill="#ffec27"/><rect x="55" y="9" width="5" height="1" fill="#ffec27"/><rect x="56" y="10" width="3" height="1" fill="#ffec27"/><rect x="58" y="7" width="3" height="3" fill="#1d2b53"/><rect class="tw t0" x="9" y="6" width="1" height="1" fill="#fff1e8"/><rect class="tw t1" x="19" y="10" width="1" height="1" fill="#fff1e8"/><rect class="tw t2" x="28" y="5" width="1" height="1" fill="#fff1e8"/><rect class="tw t0" x="40" y="8" width="1" height="1" fill="#fff1e8"/><rect class="tw t1" x="13" y="13" width="1" height="1" fill="#fff1e8"/><rect class="tw t2" x="47" y="5" width="1" height="1" fill="#fff1e8"/><rect class="tw t0" x="63" y="14" width="1" height="1" fill="#fff1e8"/><rect class="tw t1" x="33" y="12" width="1" height="1" fill="#fff1e8"/><rect x="35" y="3" width="2" height="21" fill="#5f574f"/><rect x="4" y="13" width="64" height="1" fill="#5f574f"/><rect x="2" y="1" width="68" height="1" fill="#83769c"/><rect x="2" y="25" width="68" height="1" fill="#83769c" opacity=".0"/><rect x="0" y="26" width="72" height="2" fill="#ffa300"/><rect x="0" y="28" width="72" height="3" fill="#ab5236"/><rect x="0" y="31" width="72" height="1" fill="#7e2553"/><rect x="12" y="20" width="1" height="1" fill="#fff1e8"/><rect x="13" y="20" width="6" height="1" fill="#ab5236"/><rect x="19" y="20" width="1" height="1" fill="#fff1e8"/><rect x="12" y="21" width="10" height="1" fill="#fff1e8"/><rect x="12" y="22" width="8" height="1" fill="#fff1e8"/><rect x="21" y="22" width="1" height="1" fill="#fff1e8"/><rect x="12" y="23" width="10" height="1" fill="#fff1e8"/><rect x="13" y="24" width="6" height="1" fill="#fff1e8"/><rect x="13" y="25" width="8" height="1" fill="#c2c3c7"/><g class="st st0"><rect x="14" y="17" width="1" height="2" fill="#fff1e8"/><rect x="15" y="15" width="1" height="2" fill="#fff1e8"/></g><g class="st st1"><rect x="17" y="17" width="1" height="2" fill="#fff1e8"/><rect x="18" y="15" width="1" height="2" fill="#fff1e8"/></g><g class="st st2"><rect x="19" y="17" width="1" height="2" fill="#fff1e8"/><rect x="20" y="15" width="1" height="2" fill="#fff1e8"/></g><g class="ta"><rect x="60" y="21" width="1" height="1" fill="#ffa300"/><rect x="59" y="22" width="2" height="1" fill="#ffa300"/><rect x="59" y="23" width="1" height="1" fill="#ffa300"/><rect x="59" y="24" width="1" height="1" fill="#ffa300"/><rect x="58" y="25" width="2" height="1" fill="#ffa300"/></g><g class="tb"><rect x="59" y="21" width="1" height="1" fill="#ffa300"/><rect x="59" y="22" width="1" height="1" fill="#ffa300"/><rect x="58" y="23" width="2" height="1" fill="#ffa300"/><rect x="58" y="24" width="3" height="1" fill="#ffa300"/><rect x="60" y="25" width="1" height="1" fill="#ffa300"/></g><rect x="46" y="13" width="2" height="1" fill="#ffa300"/><rect x="54" y="13" width="2" height="1" fill="#ffa300"/><rect x="46" y="14" width="1" height="1" fill="#ffa300"/><rect x="47" y="14" width="1" height="1" fill="#ff77a8"/><rect x="48" y="14" width="1" height="1" fill="#ffa300"/><rect x="53" y="14" width="1" height="1" fill="#ffa300"/><rect x="54" y="14" width="1" height="1" fill="#ff77a8"/><rect x="55" y="14" width="1" height="1" fill="#ffa300"/><rect x="46" y="15" width="10" height="1" fill="#ffa300"/><rect x="46" y="16" width="2" height="1" fill="#ffa300"/><rect x="48" y="16" width="1" height="1" fill="#000"/><rect x="49" y="16" width="4" height="1" fill="#ffa300"/><rect x="53" y="16" width="1" height="1" fill="#000"/><rect x="54" y="16" width="2" height="1" fill="#ffa300"/><rect x="46" y="17" width="5" height="1" fill="#ffa300"/><rect x="51" y="17" width="2" height="1" fill="#ff77a8"/><rect x="53" y="17" width="3" height="1" fill="#ffa300"/><rect x="46" y="18" width="2" height="1" fill="#ffa300"/><rect x="48" y="18" width="6" height="1" fill="#fff1e8"/><rect x="54" y="18" width="2" height="1" fill="#ffa300"/><rect x="47" y="19" width="8" height="1" fill="#ffa300"/><rect x="46" y="20" width="10" height="1" fill="#ffa300"/><rect x="45" y="21" width="4" height="1" fill="#ffa300"/><rect x="49" y="21" width="4" height="1" fill="#fff1e8"/><rect x="53" y="21" width="4" height="1" fill="#ffa300"/><rect x="45" y="22" width="4" height="1" fill="#ffa300"/><rect x="49" y="22" width="4" height="1" fill="#fff1e8"/><rect x="53" y="22" width="4" height="1" fill="#ffa300"/><rect x="45" y="23" width="4" height="1" fill="#ffa300"/><rect x="49" y="23" width="4" height="1" fill="#fff1e8"/><rect x="53" y="23" width="4" height="1" fill="#ffa300"/><rect x="45" y="24" width="12" height="1" fill="#ffa300"/><rect x="45" y="25" width="1" height="1" fill="#ffa300"/><rect x="46" y="25" width="2" height="1" fill="#fff1e8"/><rect x="48" y="25" width="6" height="1" fill="#ffa300"/><rect x="54" y="25" width="2" height="1" fill="#fff1e8"/><rect x="56" y="25" width="1" height="1" fill="#ffa300"/><rect class="bl" x="48" y="16" width="1" height="1" fill="#ffa300"/><rect class="bl" x="53" y="16" width="1" height="1" fill="#ffa300"/></svg>`;
 let newsDone = false;
 function renderNews(){
   const m = $('nmodal'), w = S && S.whatsNew;
   if(!w || newsDone || (S.import) || !S.welcomed){ if(!w) m.classList.add('hidden'); return; }
   if(!m.classList.contains('hidden')) return;
   const q = x => String(x).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  $('nsheet').innerHTML = `<div class="sheet-h"><h2>UPDATED TO ${q(w.version)}!</h2></div>
+  $('nsheet').innerHTML = COZY + `<div class="sheet-h"><h2>UPDATED TO ${q(w.version)}!</h2></div>
     <p style="margin-bottom:8px"><b>What's new</b></p>
     <ul style="margin:0 0 12px 18px;line-height:1.5">${(w.notes||['Small fixes and improvements.']).map(n => '<li>'+q(n)+'</li>').join('')}</ul>
     <p style="margin-bottom:12px">Thank you for using Sharkoxy and for helping it grow. - Shahriar</p>
@@ -1001,7 +1078,7 @@ function render(){
     setHTML($('sheet'), `
       <div class="sheet-h"><h2>SETTINGS</h2><button class="btn sm pri" data-close>Done</button></div>
       <div class="grp-t">Appearance</div>
-      <div class="grp"><div style="padding:8px 14px">${themeCards(s.theme || 'pixel')}</div></div>
+      <div class="grp"><div style="padding:8px 14px">${themeCards(s.theme || 'apple')}</div></div>
       <div class="grp-t">Fastest server</div>
       <div class="grp">
         <div class="set"><div><b>Always on the fastest</b><span>Sharkoxy times every server (best of 3 tries) and moves you to the fastest one on its own. It also re-tests after the PC wakes from sleep.</span></div></div>
@@ -1024,6 +1101,7 @@ function render(){
         <div class="set"><div><b>Open clash:// and sing-box:// links</b><span>For "Import to Clash" buttons on provider websites. sharkoxy:// links always work</span></div>${sw('linkall', !!s.linkAll)}</div>
         <div class="set"><div><b>Shark animation when connecting</b><span>A short popup while the connection is made</span></div>${sw('anim', !s.noAnim)}</div>
         <div class="set"><div><b>Keep Sharkoxy up to date</b><span>Downloads signed updates in the background and asks before restarting</span></div>${sw('selfUpdate', s.selfUpdate)}</div>
+        <div class="set"><div><b>Version ${esc(S.version)}</b><span id="updst">${updStatus()}</span></div><button class="btn sm" data-chkupd ${S.update.checking ? 'disabled' : ''}>Check for updates</button></div>
       </div>
       <div class="grp-t">Custom rules</div>
       <div class="grp">

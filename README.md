@@ -18,7 +18,7 @@
 <h3 align="center">Paste your subscription. Press one button. Stay on the fastest server.</h3>
 
 <p align="center">
-Sharkoxy is a free, open-source proxy client for Windows.<br>
+I made Sharkoxy, a free, open-source proxy client for Windows.<br>
 It tests your servers, connects you to the fastest one, and switches by itself when a server slows down or dies.<br>
 No accounts. No ads. No tracking. The engine is built in.
 </p>
@@ -139,7 +139,6 @@ Open an <a href="../../issues">issue</a> and attach <code>app.log</code> from <c
 - [x] Multiple subscriptions, clipboard and browser-link import
 - [x] Signed auto-updates with a "what's new" note
 - [x] Three looks, live speed graph, world map
-- [ ] `winget install Sharkoxy`
 - [ ] Code-signed installer
 - [ ] Android app
 - [ ] iOS app
@@ -154,7 +153,7 @@ Release builds are made automatically from this repository by GitHub Actions. Wi
 
 ## 👋 About
 
-Sharkoxy is made by **Shahriar Rahman**, who wanted a proxy app that simply stays connected, picks the best server by itself and is pleasant to use. The story is in **[About Sharkoxy.docx](About%20Sharkoxy.docx)**.
+Hi, I'm **Shahriar Rahman**. I made Sharkoxy because I wanted a proxy app that simply stays connected, picks the best server by itself and is pleasant to use. I started it as a side project and I keep improving it a little every day. My story is in **[About Sharkoxy.docx](About%20Sharkoxy.docx)**.
 
 Questions and ideas are welcome in [Issues](../../issues), or by email: bookcollectionforcloud@gmail.com
 

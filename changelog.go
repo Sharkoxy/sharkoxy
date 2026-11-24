@@ -7,6 +7,12 @@ type whatsNew struct {
 
 // changelog is shown once, in a popup, the first time a new version starts.
 var changelog = map[string][]string{
+	"1.8.0": {
+		"New theme: Midnight - a minimal, terminal-style pure-black look (Settings > Appearance)",
+		"Clean & Soft is now the default look",
+		"New: Check for updates button in Settings; updates are checked every 2 hours",
+		"Fixed: text overlapping under the speed graph",
+	},
 	"1.7.2": {
 		"Fixed: the app window could stop loading (\"can't reach this page\") after many hours of use",
 		"Fixed: false \"no internet\" and disconnects in very long sessions; the connection now repairs itself",
